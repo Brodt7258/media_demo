@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
 
 function App() {
   const [image, setImage] = useState(null);
+  const inputRef = useRef(null);
 
   const handleSelect = e => {
     setImage(e.target.files[0])
+    //e.target.value = null;
     //console.log(e.target.files[0])
   };
 
-  const handleSubmit = async (e) => {
+  const handleLocalSubmit = async (e) => {
     e.preventDefault();
     console.log(image);
     const data = new FormData();
@@ -22,21 +24,30 @@ function App() {
       data
     );
     console.log('RESPONSE', res);
+    inputRef.current.value = null;
+  };
+
+  const handleSignedSubmit = async (e) => {
+
   };
 
   return (
     <div className="App">
       <header className="App-header">
         <h2>Cloudinary Demo</h2>
-        <form onSubmit={handleSubmit}>
+        <form>
           <label htmlFor="image">Image</label>
           <input 
             type="file" 
             name="image" 
             onChange={handleSelect}
+            ref={inputRef}
           />
-          <button type="submit">
-            Submit
+          <button onClick={handleLocalSubmit}>
+            Submit unsigned
+          </button>
+          <button onClick={handleSignedSubmit}>
+            Submit signed
           </button>
         </form>
       </header>
