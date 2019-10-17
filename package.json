@@ -1,0 +1,14 @@
+{
+  "name": "cloudinary-demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "dot-env": "^0.0.1",
+    "express": "^4.17.1",
+    "nodemon": "^1.19.4"
+  }
+}
