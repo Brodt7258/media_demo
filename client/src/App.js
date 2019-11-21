@@ -1,59 +1,54 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import './App.css';
 
 function App() {
-  const [image, setImage] = useState(null);
-  const inputRef = useRef(null);
+  const [images, setImages] = useState([]);
+  const onDrop = useCallback(acceptedFiles => {
+    console.log(acceptedFiles);
+    setImages(prev => [...prev, ...acceptedFiles]);
+  }, []);
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
 
-  const handleSelect = e => {
-    setImage(e.target.files[0])
-    //e.target.value = null;
-    //console.log(e.target.files[0])
-  };
+  // const [albums, setAlbums] = useState([]);
+  // useEffect(() => {
+  //   axios.get('http://localhost:4000/users/0/albums')
+  //     .then(({ data }) => {
+  //       setAlbums(data);
+  //     })
+  // }, []);
 
-  const handleLocalSubmit = async (e) => {
-    e.preventDefault();
-    console.log(image);
+  const handleSubmit = () => {
     const data = new FormData();
-    data.append('file', image);
-    data.append('upload_preset', 'media_demo');
-    data.append('cloud_name', 'dbl8pi1ms');
-    const res = await axios.post(
-      'https://api.cloudinary.com/v1_1/dbl8pi1ms/image/upload',
-      data
-    );
-    console.log('RESPONSE', res);
-    inputRef.current.value = null;
-  };
-
-  const handleSignedSubmit = async (e) => {
-
+    images.forEach(e => {
+      data.append('files', e);
+    });
+    data.append('albums', [0, 1, 2 ,3]);
+    axios.post('http://localhost:5000/upload', data);
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h2>Cloudinary Demo</h2>
-        <form>
-          <label htmlFor="image">Image</label>
-          <input 
-            type="file" 
-            name="image" 
-            onChange={handleSelect}
-            ref={inputRef}
-          />
-          <button onClick={handleLocalSubmit}>
-            Submit unsigned
-          </button>
-          <button onClick={handleSignedSubmit}>
-            Submit signed
-          </button>
-        </form>
-      </header>
-      
-    </div>
+    <React.Fragment>
+      <div>Upload photos</div>
+      <div {...getRootProps()}>
+        <input {...getInputProps()} />
+        {
+          isDragActive ?
+            <p>Drop the files here ...</p> :
+            <p>Drag 'n' drop some files here, or click to select files</p>
+        }
+      </div>
+      <button onClick={handleSubmit}>
+        Submit
+      </button>
+      {/* {
+        images.map((e, i) => (
+          <img key={i} src={URL.createObjectURL(e)} alt="" />
+        ))
+      } */}
+    </React.Fragment>
   );
-}
+};
 
 export default App;

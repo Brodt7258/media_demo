@@ -1,6 +1,9 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
+const cors = require('cors');
+
 const server = express();
+server.use(cors());
 server.use(express.json());
 server.use(fileUpload({
   useTempFiles: true
@@ -18,21 +21,23 @@ server.get('/', (req, res) => {
 });
 
 server.post('/upload', (req, res) => {
-  const file = req.files.image;
+  const file = req.files;
+  console.log(req);
   console.log(file);
-  cloudinary.uploader.upload(file.tempFilePath, (err, result) => {
-    if (err) {
-      console.log(err);
-      res.status(500).json({ message: 'something broke' });
-    }
+  console.log(req.body);
+  // cloudinary.uploader.upload(file.tempFilePath, (err, result) => {
+  //   if (err) {
+  //     console.log(err);
+  //     res.status(500).json({ message: 'something broke' });
+  //   }
 
-    res.status(201).json({
-      success: true,
-      result
-    });
-  });
+  //   res.status(201).json({
+  //     success: true,
+  //     result
+  //   });
+  // });
 
-  //res.status(201).json({ message: 'received' });
+  res.status(201).json({ message: 'received' });
 });
 
 module.exports = server;
