@@ -21,10 +21,22 @@ server.get('/', (req, res) => {
 });
 
 server.post('/upload', (req, res) => {
-  const file = req.files;
-  console.log(req);
-  console.log(file);
-  console.log(req.body);
+  // const file = req.files;
+  //console.log(req);
+  // console.log(file);
+  // console.log(req.body.albums);
+  const mediaData = JSON.parse(req.body.media);
+  // console.log(mediaData);
+  // console.log(mediaData[0].meta);
+
+  const media = mediaData.map(e => {
+    e.file = req.files[e.title]
+    return e;
+  });
+
+  console.log(req.body.albums);
+  console.log(media);
+
   // cloudinary.uploader.upload(file.tempFilePath, (err, result) => {
   //   if (err) {
   //     console.log(err);

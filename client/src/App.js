@@ -3,11 +3,53 @@ import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import './App.css';
 
+export const uploadMedia = async (media, albums, user_id) => {
+
+  console.log(media);
+  const submission = new FormData();
+  submission.append('albums', albums);
+  submission.append('media', JSON.stringify(media.map(({ file, ...rest }) => rest)));
+  // submission.append('files', media.reduce((obj, e) => {
+  //   obj[e.title] = e.file;
+  //   return obj;
+  // }, {}));
+
+  media.forEach(e => {
+    submission.append(e.title, e.file);
+  })
+
+  console.log(submission.getAll('media'));
+  //console.log(submission.getAll('files'));
+
+  // route will probably change
+  const { data } = axios.post(
+    `http://localhost:5000/upload`,
+    submission
+  );
+  return data;
+};
+
 function App() {
   const [images, setImages] = useState([]);
   const onDrop = useCallback(acceptedFiles => {
     console.log(acceptedFiles);
-    setImages(prev => [...prev, ...acceptedFiles]);
+    const media = acceptedFiles.map((e, i) => {
+      return {
+        title: `A Photo Title ${i}`,
+        caption: 'A Photo Caption',
+        keywords: ['keyword one', 'keyword two'],
+        meta: [{
+          name: 'Meta Name',
+          value: 'Meta Value'
+        }, {
+          name: 'Other Meta Name',
+          value: 'Other Meta Value'
+        }],
+        file: e
+      }
+    });
+    console.log(media);
+    setImages(prev => [...prev, ...media]);
   }, []);
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
 
@@ -19,13 +61,23 @@ function App() {
   //     })
   // }, []);
 
+  const changeImageName = () => {
+    if (images.length) {
+      images[0].title = 'title!!!!';
+    } else {
+      console.error('no images available to mess with');
+    }
+  };
+
   const handleSubmit = () => {
-    const data = new FormData();
-    images.forEach(e => {
-      data.append('files', e);
-    });
-    data.append('albums', [0, 1, 2 ,3]);
-    axios.post('http://localhost:5000/upload', data);
+    // const data = new FormData();
+    // images.forEach((e, i) => {
+    //   data.append(`title  ${i}`, e, `title${i}`);
+    // });
+    // data.append('albums', [0, 1, 2 ,3]);
+    // console.log(data.getAll('files'));
+    // axios.post('http://localhost:5000/upload', data);
+    uploadMedia(images, [-1, 0, -1, 2], 1);
   };
 
   return (
@@ -41,6 +93,9 @@ function App() {
       </div>
       <button onClick={handleSubmit}>
         Submit
+      </button>
+      <button onClick={changeImageName}>
+        change name
       </button>
       {/* {
         images.map((e, i) => (
