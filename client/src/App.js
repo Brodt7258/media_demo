@@ -6,17 +6,19 @@ import './App.css';
 export const uploadMedia = async (media, albums, user_id) => {
 
   console.log(media);
+  console.log(media.map(({ file, ...rest }) => rest));
   const submission = new FormData();
   submission.append('albums', albums);
   submission.append('media', JSON.stringify(media.map(({ file, ...rest }) => rest)));
-  // submission.append('files', media.reduce((obj, e) => {
-  //   obj[e.title] = e.file;
-  //   return obj;
-  // }, {}));
+
+// req.files.reduce((obj, e) => {
+//     obj[e.name] = e;
+//     return obj;
+//   }, {});
 
   media.forEach(e => {
-    submission.append(e.title, e.file);
-  })
+    submission.append('files', e.file, e.title);
+  });
 
   console.log(submission.getAll('media'));
   //console.log(submission.getAll('files'));
@@ -49,7 +51,8 @@ function App() {
       }
     });
     console.log(media);
-    setImages(prev => [...prev, ...media]);
+    //setImages(prev => [...prev, ...media]);
+    setImages(media);
   }, []);
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
 
