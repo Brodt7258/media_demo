@@ -1,29 +1,52 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import './App.css';
 
+import { createGlobalStyle } from 'styled-components';
+import Trianglify from 'trianglify';
+
+const pattern = Trianglify({
+  height: 1080,
+  width: 1920,
+  cell_size: 40,
+  stroke_width: 45,
+  x_colors: ['#c33764', '#1d2671'],
+});
+
+const GlobalStyle = createGlobalStyle`
+  html {
+    background-color: #000;
+    background: url(${pattern.png()}) no-repeat center center fixed;
+    background-size: cover;
+  }
+`;
+
 export const uploadMedia = async (media, albums, user_id) => {
 
-  console.log(media);
-  console.log(media.map(({ file, ...rest }) => rest));
+  // console.log(media);
+  // console.log(media.map(({ file, ...rest }) => rest));
+  const indexedMedia = media.map((e, i) => {
+    e.id = i;
+    return e;
+  });
+
   const submission = new FormData();
   submission.append('albums', albums);
-  submission.append('media', JSON.stringify(media.map(({ file, ...rest }) => rest)));
+  submission.append('media', JSON.stringify(indexedMedia.map(({ file, ...rest }) => rest)));
 
 // req.files.reduce((obj, e) => {
 //     obj[e.name] = e;
 //     return obj;
 //   }, {});
 
-  media.forEach(e => {
-    submission.append('files', e.file, e.title);
+indexedMedia.forEach(e => {
+    console.log(e.id);
+    submission.append('files', e.file, `${e.title} --${e.id}`);
   });
 
   console.log(submission.getAll('media'));
-  //console.log(submission.getAll('files'));
 
-  // route will probably change
   const { data } = axios.post(
     `http://localhost:5000/upload`,
     submission
@@ -35,6 +58,7 @@ function App() {
   const [images, setImages] = useState([]);
   const onDrop = useCallback(acceptedFiles => {
     console.log(acceptedFiles);
+
     const media = acceptedFiles.map((e, i) => {
       return {
         title: `A Photo Title ${i}`,
@@ -51,8 +75,8 @@ function App() {
       }
     });
     console.log(media);
-    //setImages(prev => [...prev, ...media]);
-    setImages(media);
+    setImages(prev => [...prev, ...media]);
+    // setImages(media);
   }, []);
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
 
@@ -83,8 +107,13 @@ function App() {
     uploadMedia(images, [-1, 0, -1, 2], 1);
   };
 
+  useEffect(() => {
+    console.log(images)
+  }, [images]);
+
   return (
     <React.Fragment>
+      <GlobalStyle />
       <div>Upload photos</div>
       <div {...getRootProps()}>
         <input {...getInputProps()} />

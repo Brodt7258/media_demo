@@ -4,11 +4,14 @@
   "private": true,
   "dependencies": {
     "axios": "^0.19.0",
+    "md5": "^2.2.1",
     "md5-file": "^4.0.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-dropzone": "^10.2.0",
-    "react-scripts": "3.2.0"
+    "react-scripts": "3.2.0",
+    "styled-components": "^4.4.1",
+    "trianglify": "^2.0.0"
   },
   "scripts": {
     "start": "react-scripts start",

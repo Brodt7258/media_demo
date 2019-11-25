@@ -25,7 +25,8 @@ server.post('/upload', (req, res) => {
   //console.log(req);
   console.log(req.files);
   const fileData = req.files.files.reduce((obj, e) => {
-    obj[e.name] = e;
+    const splitName = e.name.split('--');
+    obj[splitName[splitName.length - 1]] = e;
     return obj;
   }, {});
   // console.log(req.body.albums);
@@ -34,7 +35,7 @@ server.post('/upload', (req, res) => {
   // console.log(mediaData[0].meta);
 
   const media = mediaData.map(e => {
-    e.file = fileData[e.title];
+    e.file = fileData[e.id];
     return e;
   });
 
